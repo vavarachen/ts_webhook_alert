@@ -1,0 +1,70 @@
+<setup>
+  
+  <block title="Anomali ThreatStream Indicator Export" entity="ts_webhook_alert" endpoint="admin/alert_actions">
+      <text>Anomali ThreatStream is accessible through REST APIs, which are available to all Premium customers. This Splunk application implements the ability to export structured data to ThreatStream platform via ThreatStream API.  Once imported, you must review and approve the import in ThreatStream platform.
+      </text>
+  </block>
+	  
+  <block entity="_new" title="API Credentials" endpoint="storage/passwords">
+      <input field="name">
+        <label>ThreatStream Username</label>
+        <type>text</type>
+      </input>
+      <input field="password">
+        <label>ThreatStream API Key</label>
+        <type>password</type>
+      </input>
+  </block>
+
+  <block entity="ts_webhook_alert" title="Indicator Export Defaults" endpoint="admin/alert_actions">
+      	<input field="param.ts_import_url">
+            <label>ThreatStream ReSTful API Endpoint</label>
+	    <type>text</type>
+      	</input>
+	<text> For reference, see ThreatStream API Reference Guide ("Import (with approval)")</text>
+        <input field="param.ts_tags">
+            <label>Tags (Optional. csv)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_trusted_circles">
+            <label>Trusted Circles (Optional. csv)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_source_confidence">
+            <label>Source Confidence [0-100] (Required)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_confidence">
+            <label>Confidence [0-100] (Required)</label>
+            <type>integer</type>
+        </input>
+        <input field="param.ts_classification">
+            <label>Classification [ private | public ] (Required)</label>
+            <type>text</type>
+	</input>
+        <input field="param.ts_severity">
+            <label>Severity [ low | medium | high | very-high ] (Optional)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_mapping_md5">
+            <label>Hashes (Required)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_mapping_ip">
+            <label>IP (Required)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_mapping_domain">
+            <label>Domain (Required)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_mapping_url">
+            <label>URL (Required)</label>
+            <type>text</type>
+        </input>
+        <input field="param.ts_mapping_email">
+            <label>Email (Required)</label>
+            <type>text</type>
+        </input>
+    </block>
+</setup>

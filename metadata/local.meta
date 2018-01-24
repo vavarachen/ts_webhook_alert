@@ -1,0 +1,23 @@
+[app/install/install_source_checksum]
+version = 6.6.4
+modtime = 1513876433.875245000
+
+[app/ui]
+version = 6.6.4
+modtime = 1513900046.917068000
+
+[app/launcher]
+version = 6.6.4
+modtime = 1513900046.922725000
+
+[app/package/check_for_updates]
+version = 6.6.4
+modtime = 1513900046.924080000
+
+[alert_actions/ts_webhook_alert]
+version = 6.6.2
+modtime = 1514357446.475681000
+
+[app/install/is_configured]
+version = 6.6.2
+modtime = 1514357446.504206000

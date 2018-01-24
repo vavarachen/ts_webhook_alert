@@ -1,0 +1,7 @@
+[]
+export=system
+access = read : [ * ], write : [ admin, power ]
+
+[alert_actions/ts_webhook_alert]
+access = read : [ * ], write : [ * ]
+export = system

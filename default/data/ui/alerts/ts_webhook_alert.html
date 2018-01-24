@@ -1,0 +1,219 @@
+<form class="form-vertical form-complex">
+    <!-- INDICATOR MAPPINGS  -->
+    <!-- HASH -->
+    <div class="control-group">
+        <label class="control-label" for="ts_mapping_md5">Hash Mapping</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_mapping_md5" id="ts_mapping_md5">
+		        <option value="mal_md5">mal_md5</option>
+		        <option value="apt_md5">apt_md5</option>
+	        </select>
+	        <span class="help-block">
+            Anomali Threatstream support five types of indicators for import.
+            <ul>
+                <li>Hash</li>
+                <li>IP</li>
+                <li>Domain</li>
+                <li>URL</li>
+                <li>Email</li>
+            </ul><br>See <a href="https://ui.threatstream.com/optic-doc/Content/appendices/app_indicators.htm" target="_blank">Indicator Types in Threatstream</a>.
+	        </span>
+        </div>
+    </div>
+    <!-- IP -->
+    <div class="control-group">
+        <label class="control-label" for="ts_mapping_ip">IP Mapping</label>
+        <div class="controls">
+        	<select name="action.ts_webhook_alert.param.ts_mapping_ip" id="ts_mapping_ip">
+		<option value="actor_ip">actor_ip</option>
+		<option value="apt_ip">apt_ip</option>
+		<option value="bot_ip">bot_ip</option>
+		<option value="brute_ip">brute_ip</option>
+		<option value="c2_ip">c2_ip</option>
+		<option value="compromised_ip">compromised_ip</option>
+		<option value="ddos_ip">ddos_ip</option>
+		<option value="exfil_ip">exfil_ip</option>
+		<option value="exploit_ip">exploit_ip</option>
+		<option value="i2p_ip">i2p_ip</option>
+		<option value="mal_ip">mal_ip</option>
+		<option value="parked_ip">parked_ip</option>
+		<option value="phish_ip">phish_ip</option>
+		<option value="proxy_ip">proxy_ip</option>
+		<option value="scan_ip">scan_ip</option>
+		<option value="sinkhole_ip">sinkhole_ip</option>
+		<option value="spam_ip">spam_ip</option>
+		<option value="ssh_ip">ssh_ip</option>
+		<option value="tor_ip">tor_ip</option>
+		<option value="vps_ip">vps_ip</option>
+		<option value="actor_ipv6">actor_ipv6</option>
+		<option value="anon_proxy_ipv6">anon_proxy_ipv6</option>
+		<option value="anon_vpn_ipv6">anon_vpn_ipv6</option>
+		<option value="apt_ipv6">apt_ipv6</option>
+		<option value="brute_ipv6">brute_ipv6</option>
+		<option value="c2_ipv6">c2_ipv6</option>
+		<option value="compromised_ipv6">compromised_ipv6</option>
+		<option value="ddos_ipv6">ddos_ipv6</option>
+		<option value="exploit_ipv6">exploit_ipv6</option>
+		<option value="i2p_ipv6">i2p_ipv6</option>
+		<option value="mal_ipv6">mal_ipv6</option>
+		<option value="parked_ipv6">parked_ipv6</option>
+		<option value="phish_ipv6">phish_ipv6</option>
+		<option value="proxy_ipv6">proxy_ipv6</option>
+		<option value="scan_ipv6">scan_ipv6</option>
+		<option value="sinkhole_ipv6">sinkhole_ipv6</option>
+		<option value="spam_ipv6">spam_ipv6</option>
+		<option value="ssh_ipv6">ssh_ipv6</option>
+		<option value="tor_ipv6">tor_ipv6</option>
+		<option value="vps_ipv6">vps_ipv6</option>
+            </select>
+        </div>
+    </div>
+    <!-- DOMAIN -->
+    <div class="control-group">
+        <label class="control-label" for="ts_mapping_domain">Domain Mapping</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_mapping_domain" id="ts_mapping_domain">
+                <option value="adware_domain">adware_domain</option>
+                <option value="apt_domain">apt_domain</option>
+                <option value="c2_domain">c2_domain</option>
+                <option value="compromised_domain">compromised_domain</option>
+                <option value="exfil_domain">exfil_domain</option>
+                <option value="exploit_domain">exploit_domain</option>
+                <option value="mal_domain">mal_domain</option>
+                <option value="parked_domain">parked_domain</option>
+                <option value="phish_domain">phish_domain</option>
+                <option value="sinkhole_domain">sinkhole_domain</option>
+                <option value="spam_domain">spam_domain</option>
+                <option value="suspicious_domain">suspicious_domain</option>
+                <option value="vpn_domain">vpn_domain</option>
+            </select>
+        </div>
+    </div>
+    <!-- URL -->
+    <div class="control-group">
+        <label class="control-label" for="ts_mapping_url">URL Mapping</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_mapping_url" id="ts_mapping_url">
+                <option value="apt_url">apt_url</option>
+                <option value="c2_url">c2_url</option>
+                <option value="compromised_url">compromised_url</option>
+                <option value="exfil_url">exfil_url</option>
+                <option value="exploit_url">exploit_url</option>
+                <option value="geolocation_url">geolocation_url</option>
+                <option value="ipcheck_url">ipcheck_url</option>
+                <option value="mal_url">mal_url</option>
+                <option value="parked_url">parked_url</option>
+                <option value="pastesite_url">pastesite_url</option>
+                <option value="phish_url">phish_url</option>
+                <option value="spam_url">spam_url</option>
+                <option value="speedtest_url">speedtest_url</option>
+                <option value="torrent_tracker_url">torrent_tracker_url</option>
+            </select>
+        </div>
+    </div>
+    <!-- EMAIL -->
+    <div class="control-group">
+        <label class="control-label" for="ts_mapping_email">Email Mapping</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_mapping_email" id="ts_mapping_email">
+                <option value="apt_email">apt_email</option>
+                <option value="compromised_email">compromised_email</option>
+                <option value="mal_email">mal_email</option>
+                <option value="phish_email">phish_email</option>
+                <option value="spam_email">spam_email</option>
+            </select>
+        </div>
+    </div>
+    <!-- END OF INDICATOR MAPPINGS  -->
+    <br>
+    <!-- CLASSIFICATION -->
+    <div class="control-group">
+        <label class="control-label" for="ts_classification">Classification</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_classification" id="ts_classification">
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+            </select>
+            <span class="help-block">
+                Value must be either 'private' or 'public'. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/threat_model/threat_model_intro_new.htm">Public vs. Private</a>.
+            </span>
+        </div>
+    </div>
+    <br>
+    <!-- SEVERITY -->
+    <div class="control-group">
+        <label class="control-label" for="ts_severity">Classification</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_severity" id="ts_severity">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="very-high">Very-High</option>
+            </select>
+            <span class="help-block">
+                Indicator types are mapped to one of four severity values: Low, Medium, High, and Very-High.. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/threat_model/Observables/details_indicator.htm">Observables</a>.
+            </span>
+        </div>
+    </div>
+    <br>
+    <!-- TAGS -->
+    <div class="control-group">
+        <label class="control-label" for="ts_tags">Tags</label>
+        <div class="controls">
+            <input name="action.ts_webhook_alert.param.ts_tags" id="ts_tags" type="text"/>
+	          <span class="help-block">
+	            Value must be a Comma seperated list of tags. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/threat_model/Observables/adding_private_tags.htm">Adding Private Tags to Observables</a>.
+	          </span>
+        </div>
+    </div>
+
+    <br>
+    <!-- EXPIRATION -->
+    <div class="control-group">
+        <label class="control-label" for="ts_expiration">Expiration</label>
+        <div class="controls">
+            <select name="action.ts_webhook_alert.param.ts_expiration" id="ts_expiration">
+                <option value="90">90 days</option>
+                <option value="60">60 days</option>
+                <option value="30">30 days</option>
+                <option value="7">1 week</option>
+                <option value="1">1 day</option>
+            </select>
+	        <span class="help-block">
+		      Exiration date for indicators. Default is 90 days.
+	        </span>
+        </div>
+    </div>
+
+    <br>
+    <!-- TRUSTED CIRCLE -->
+    <div class="control-group">
+        <label class="control-label" for="ts_trusted_cicles">Trusted Circles</label>
+        <div class="controls">
+            <input name="action.ts_webhook_alert.param.ts_trusted_circles" id="ts_trusted_circles" type="text"/>
+	        <span class="help-block">
+		        Value must be a comma seperated list of Trusted Circle IDs. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/Trusted_Circles/tc_intro.htm">Collaborating with Trusted Circles </a>.
+	        </span>
+        </div>
+    </div>
+
+    <br>
+    <!-- CONFIDENCE -->
+    <div class="control-group">
+        <label class="control-label" for="ts_confidence">Confidence</label>
+        <div class="controls">
+            <input name="action.ts_webhook_alert.param.ts_confidence" id="ts_confidence" type="text" value="100"/>
+            <span class="help-block">Value must be between 0-100. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/threat_model/Observables/details_indicator.htm">Observables</a>.</span>
+        </div>
+    </div>
+
+    <br>
+    <!-- SOURCE CONFIDENCE -->
+    <div class="control-group">
+        <label class="control-label" for="ts_source_confidence">Source Confidence</label>
+        <div class="controls">
+            <input name="action.ts_webhook_alert.param.ts_source_confidence" id="ts_source_confidence" type="text" value="100"/>
+    	   	<span class="help-block">Value must be between 0-100. See <a href="https://ui.threatstream.com/optic-doc/Content/Features/threat_model/Observables/details_indicator.htm">Observables</a>.</span>
+        </div>
+    </div>
+</form>
