@@ -43,7 +43,7 @@ def get_future_date(days):
 
 def getCredentials(sessionKey):
     """ Retrieve Anomali Threatstream username and API key """
-    myapp = 'ts-webhook-alert'
+    myapp = 'ts_webhook_alert'
     try:
         # list all credentials
         entities = entity.getEntities(['admin', 'passwords'], namespace=myapp,
