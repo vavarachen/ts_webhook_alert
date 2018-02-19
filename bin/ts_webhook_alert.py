@@ -1,7 +1,7 @@
 """
 Author : vavarachen@gmail.com
-Date : Dec 27, 2017
-Version : 1.0
+Date : Feb 18, 2018
+Version : 1.1
 Description : This script can be used to send indicators from Splunk to ThreatStream.
 How the indicator is interpreted is dictated by indicator mappings.
 
@@ -24,6 +24,7 @@ For the above sample, the alert default itype, tags (configured during alert cre
 will only be applied to attacker2 email and url.  The first two indicators should override
 the alert defaults with specified itype and tags.
 """
+import os
 import requests
 import sys
 import json
@@ -31,15 +32,39 @@ import gzip
 import datetime
 import time
 import splunk.entity as entity
+import csv
+
 
 def gunzip(gzfile):
+    """
+    Uncompress the results file and sanitize it for import.
+    Splunk results file by default contains columns which don't play nice with TS import
+    """
+    
     if gzfile.endswith(".gz"):
-        return gzip.open(gzfile, 'r')
+        results_file = gzip.open(gzfile, 'rb')
     else:
-        return open(gzfile,'r')
+        results_file = open(gzfile,'r')
+
+    reader = csv.DictReader(results_file)
+    header = [r for r in reader.fieldnames if not r.startswith('__mv_')]
+
+    sanitized_results_file = os.path.join(os.path.dirname(gzfile),'sanitized_results.csv')
+    with open(sanitized_results_file,'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=header)
+        writer.writeheader()
+        for row in reader:
+            for k in row.keys():
+                if k.startswith('__mv_'):
+                    row.pop(k)
+            writer.writerow(row)
+    return open(sanitized_results_file)
+
 
 def get_future_date(days):
+    """ Indicator expiration date """
     return '%sT00:00:00' % (datetime.datetime.now().date() + datetime.timedelta(int(days)))
+
 
 def getCredentials(sessionKey):
     """ Retrieve Anomali Threatstream username and API key """
@@ -60,10 +85,16 @@ def getCredentials(sessionKey):
 
 
 def send_observables(settings):
+    """
+    This is the workhorse of the app.
+    1) Get credentials for API
+    2) Initialize variables and defaults for the import
+    3) Post data
+    """
     sessionKey = settings['session_key']
     if len(sessionKey) == 0:
-        sys.stderr.write("Session Key missing. Please enable passAuth in inputs.conf.\n")
-        sys.stderr.write("sessionKey: %s\n" % sessionKey)
+        sys.stderr.write("ERROR Session Key missing. Please enable passAuth in inputs.conf.\n")
+        sys.stderr.write("ERROR sessionKey: %s\n" % sessionKey)
         exit(2)
     ts_username, ts_key = getCredentials(sessionKey)
     
@@ -89,16 +120,19 @@ def send_observables(settings):
         "url_mapping": config['ts_mapping_url'],
         "email_mapping": config['ts_mapping_email']
     })
+
+
     try:
         # By default the filename is 'results.csv.gz' which is not very helpful.
         # For easier correlation, filename is based on saved search name and timestamp
         r_file = {'file': ("%s-%d" % (search_name, int(time.time())), gunzip(results_file).read(), 'application/octet-stream')}
-        res = requests.post(ts_url, params=r_params,  data=r_data, files=r_file)
-        if 200 <= res.status_code < 300:
-            sys.stderr.write("DEBUG receiver endpoint responded with HTTP status=%d\n" % res.status_code)
+        res = requests.post(ts_url, params=r_params,  data=r_data, files=r_file, verify=True)
+
+        if res.ok:
+            sys.stderr.write("INFO receiver endpoint responded with HTTP status=%d, reason=%s\n" % (res.status_code, res.reason))
             return True
         else:
-            sys.stderr.write("ERROR receiver endpoint responded with HTTP status=%d\n" % res.status_code)
+            sys.stderr.write("ERROR receiver endpoint responded with HTTP status=%d, reason=%s.  Payload: %s\n" % (res.status_code, res.reason, json.dumps(res.json())))
             return False
     except Exception, e:
         sys.stderr.write("ERROR Error %s\n" % e)
@@ -112,9 +146,9 @@ if __name__ == '__main__':
         if not send_observables(settings):
             # Uncomment below for troubleshooting. See, tail -f /opt/splunk/var/log/splunk/splunkd.log | grep sendmodalert
             #sys.stderr.write("DEBUG settings: %s\n" % json.dumps(settings, indent=2))
-            sys.stderr.write("ERROR Unable to contact TS endpoint\n")
+            sys.stderr.write("ERROR Unable to export indicators to TS endpoint\n")
             sys.exit(2)
         else:
-            sys.stderr.write("DEBUG TS endpoint responded with OK status\n")
+            sys.stderr.write("INFO TS endpoint responded with OK status\n")
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
