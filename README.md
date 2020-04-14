@@ -19,12 +19,12 @@ Find app ("Anomali Threatstream Indicator Export") and click "Set up"
 
 
 # Example
-Create a Splunk search which outputs indicators.  Fields like 'tag', 'itype' are optional.
+### Create a Splunk search which outputs indicators.  Fields like 'tag', 'itype' are optional.
 
 ![Splunk Search](https://github.com/vavarachen/ts_webhook_alert/blob/master/resources/alert_step1.png)
 
-Create an alert from the search.
+### Create an alert from the search.
 ![Create Alert](https://github.com/vavarachen/ts_webhook_alert/blob/master/resources/alert_step2.png)
 
-Configure ts_webhook as 'Action'.
+### Configure ts_webhook as 'Action'.
 ![Configure Action](https://github.com/vavarachen/ts_webhook_alert/blob/master/resources/alert_step3.png)
