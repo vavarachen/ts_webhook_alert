@@ -1,7 +1,7 @@
 """
 Author : vavarachen@gmail.com
-Date : Feb 18, 2018
-Version : 1.1
+Date : Apr 14, 2020
+Version : 1.2
 Description : This script can be used to send indicators from Splunk to ThreatStream.
 How the indicator is interpreted is dictated by indicator mappings.
 
@@ -33,6 +33,20 @@ import datetime
 import time
 import splunk.entity as entity
 import csv
+import logging
+from logging.handlers import RotatingFileHandler
+
+
+logger = logging.getLogger('ts_webhook_alert')
+logger.setLevel(logging.DEBUG)
+try:
+    fh = RotatingFileHandler('%s/var/log/splunk/ts_webhook.log' % os.environ['SPLUNK_HOME'], backupCount=3)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    fh.level = logging.DEBUG
+    logger.addHandler(fh)
+except Exception:
+    pass
 
 
 def gunzip(gzfile):
@@ -40,17 +54,18 @@ def gunzip(gzfile):
     Uncompress the results file and sanitize it for import.
     Splunk results file by default contains columns which don't play nice with TS import
     """
-    
+
+    logger.info("Processing results file %s" % gzfile)
     if gzfile.endswith(".gz"):
         results_file = gzip.open(gzfile, 'rb')
     else:
-        results_file = open(gzfile,'r')
+        results_file = open(gzfile, 'r')
 
     reader = csv.DictReader(results_file)
     header = [r for r in reader.fieldnames if not r.startswith('__mv_')]
 
-    sanitized_results_file = os.path.join(os.path.dirname(gzfile),'sanitized_results.csv')
-    with open(sanitized_results_file,'w') as csvfile:
+    sanitized_results_file = os.path.join(os.path.dirname(gzfile), 'sanitized_results.csv')
+    with open(sanitized_results_file, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header)
         writer.writeheader()
         for row in reader:
@@ -58,6 +73,7 @@ def gunzip(gzfile):
                 if k.startswith('__mv_'):
                     row.pop(k)
             writer.writerow(row)
+    logger.info("Wrote export file %s" % sanitized_results_file)
     return open(sanitized_results_file)
 
 
@@ -66,22 +82,21 @@ def get_future_date(days):
     return '%sT00:00:00' % (datetime.datetime.now().date() + datetime.timedelta(int(days)))
 
 
-def getCredentials(sessionKey):
+def get_credentials(session_key):
     """ Retrieve Anomali Threatstream username and API key """
-    myapp = 'ts_webhook_alert'
+    my_app = 'ts_webhook_alert'
     try:
         # list all credentials
-        entities = entity.getEntities(['admin', 'passwords'], namespace=myapp,
-                                    owner='nobody', sessionKey=sessionKey)
-    except Exception, e:
-        raise Exception("Could not get %s credentials from splunk. Error: %s"
-                      % (myapp, str(e)))
+        entities = entity.getEntities(['admin', 'passwords'], namespace=my_app, owner='nobody', sessionKey=session_key)
+    except Exception as err:
+        raise Exception("Could not get %s credentials from Splunk. Error: %s" % (my_app, str(err)))
+    else:
+        # return first set of credentials
+        for k, v in entities.items():
+            if v['eai:acl']['app'] == my_app:
+                return v['username'], v['clear_password']
 
-    # return first set of credentials
-    for i, c in entities.items():
-        return c['username'], c['clear_password']
-
-    raise Exception("No credentials have been found")  
+    raise Exception("No credentials have been found")
 
 
 def send_observables(settings):
@@ -91,12 +106,12 @@ def send_observables(settings):
     2) Initialize variables and defaults for the import
     3) Post data
     """
-    sessionKey = settings['session_key']
-    if len(sessionKey) == 0:
-        sys.stderr.write("ERROR Session Key missing. Please enable passAuth in inputs.conf.\n")
-        sys.stderr.write("ERROR sessionKey: %s\n" % sessionKey)
+    session_key = settings['session_key']
+    if len(session_key) == 0:
+        logger.error("Session Key missing. Please enable passAuth in inputs.conf.\n")
+        logger.debug("ERROR sessionKey: %s\n" % session_key)
         exit(2)
-    ts_username, ts_key = getCredentials(sessionKey)
+    ts_username, ts_key = get_credentials(session_key)
     
     config = settings['configuration']
     results_file = settings['results_file']
@@ -121,34 +136,44 @@ def send_observables(settings):
         "email_mapping": config['ts_mapping_email']
     })
 
-
     try:
         # By default the filename is 'results.csv.gz' which is not very helpful.
         # For easier correlation, filename is based on saved search name and timestamp
-        r_file = {'file': ("%s-%d" % (search_name, int(time.time())), gunzip(results_file).read(), 'application/octet-stream')}
+        r_file = {'file': ("%s-%d" % (search_name, int(time.time())),
+                           gunzip(results_file).read(), 'application/octet-stream')}
         res = requests.post(ts_url, params=r_params,  data=r_data, files=r_file, verify=True)
 
         if res.ok:
-            sys.stderr.write("INFO receiver endpoint responded with HTTP status=%d, reason=%s\n" % (res.status_code, res.reason))
+            logger.info("Receiver endpoint responded with HTTP status=%d, reason=%s\n" % (res.status_code, res.reason))
             return True
         else:
-            sys.stderr.write("ERROR receiver endpoint responded with HTTP status=%d, reason=%s.  Payload: %s\n" % (res.status_code, res.reason, json.dumps(res.json())))
+            try:
+                logger.error("Receiver endpoint responded with HTTP status=%d, reason=%s.  Payload: %s\n" %
+                             (res.status_code, res.reason, json.dumps(res.json())))
+            except Exception:
+                logger.warning("Non JSON response received from %s" % ts_url)
+                logger.error("Receiver endpoint responded with HTTP status=%d, reason=%s.  Payload: %s\n" %
+                             (res.status_code, res.reason, res.text))
             return False
-    except Exception, e:
-        sys.stderr.write("ERROR Error %s\n" % e)
-        return False
+    except Exception:
+        raise
 
 
 if __name__ == '__main__':
+    # Uncomment below for troubleshooting.
+    # See, tail -f /opt/splunk/var/log/splunk/splunkd.log | grep sendmodalert
+    # sys.stderr.write("DEBUG settings: %s\n" % json.dumps(settings, indent=2))
     if len(sys.argv) > 1 and sys.argv[1] == '--execute':
         settings = json.loads(sys.stdin.read())
 
-        if not send_observables(settings):
-            # Uncomment below for troubleshooting. See, tail -f /opt/splunk/var/log/splunk/splunkd.log | grep sendmodalert
-            #sys.stderr.write("DEBUG settings: %s\n" % json.dumps(settings, indent=2))
+        try:
+            resp = send_observables(settings)
+        except Exception as err:
+            logger.error(str(err))
             sys.stderr.write("ERROR Unable to export indicators to TS endpoint\n")
-            sys.exit(2)
+            sys.exit(-1)
         else:
+            logger.info("TS export successful.")
             sys.stderr.write("INFO TS endpoint responded with OK status\n")
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
